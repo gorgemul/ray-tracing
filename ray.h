@@ -6,6 +6,8 @@
 typedef struct {
     Point3 origin;
     Vec3 direction;
-}Ray;
+} Ray;
+
+Point3 ray_at(Ray *ray, double t);
 
 #endif // RAY_H_

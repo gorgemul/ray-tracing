@@ -9,14 +9,15 @@ typedef struct {
 
 typedef Vec3 Point3;
 
-Vec3 vec3_add(size_t n, Vec3 *vec, ...);
-Vec3 vec3_sub(size_t n, Vec3 *vec, ...);
-Vec3 vec3_mul(size_t n, Vec3 *vec, ...);
-Vec3 vec3_div(size_t n, Vec3 *vec, ...);
-Vec3 vec3_mul_scalar(size_t n, Vec3 *vec, ...);
-Vec3 vec3_div_scalar(size_t n, Vec3 *vec, ...);
+Vec3 vec3_add(Vec3 *vec, size_t n, ...);
+Vec3 vec3_sub(Vec3 *vec, size_t n, ...);
+Vec3 vec3_mul(Vec3 *vec, size_t n, ...);
+Vec3 vec3_div(Vec3 *vec, size_t n, ...);
+Vec3 vec3_mul_scalar(Vec3 *vec, size_t n, ...);
+Vec3 vec3_div_scalar(Vec3 *vec, size_t n, ...);
 Vec3 vec3_unit_vector(Vec3 *vec);
 double vec3_len_squared(Vec3 *vec);
 double vec3_len(Vec3 *vec);
+double vec3_dot(Vec3 *vec1, Vec3 *vec2);
 
 #endif // VEC3_H_

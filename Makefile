@@ -1,8 +1,11 @@
 build:
-	gcc -Wall -Wextra -pedantic -o ./ray-tracing main.c color.c vec3.c
+	gcc -Wall -Wextra -pedantic -o ./ray-tracing *.c -lm
+
+test-build:
+	gcc -Wall -Wextra -pedantic -g -o ./ray-tracing *.c -lm
 
 run: build
 	./ray-tracing
 
 clean:
-	rm *.ppm ray-tracing
+	rm -rf *.ppm ray-tracing*
