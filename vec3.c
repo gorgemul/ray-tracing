@@ -99,19 +99,24 @@ Vec3 vec3_div_scalar(Vec3 *vec, size_t n, ...)
     return result_vec;
 }
 
+Vec3 vec3_neg(Vec3 *vec)
+{
+    return vec3_mul_scalar(vec, 1, -1.0);
+}
+
 Vec3 vec3_unit_vector(Vec3 *vec)
 {
     return vec3_div_scalar(vec, 1, vec3_len(vec));
 }
 
-double vec3_len_squared(Vec3 *vec)
+double vec3_squared_len(Vec3 *vec)
 {
     return vec->x * vec->x + vec->y * vec->y + vec->z * vec->z;
 }
 
 double vec3_len(Vec3 *vec)
 {
-    return sqrt(vec3_len_squared(vec));
+    return sqrt(vec3_squared_len(vec));
 }
 
 double vec3_dot(Vec3 *vec1, Vec3 *vec2)

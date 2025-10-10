@@ -1,12 +1,39 @@
 #include "sphere.h"
 #include <math.h>
+#include <assert.h>
 
-double sphere_hit(Sphere *sphere, Ray *ray)
+static bool sphere_hit(Shape *shape, Ray *ray, double t_min, double t_max, HitRecord *record)
 {
+    Sphere *sphere = (Sphere*)shape;
     Vec3 OC = vec3_sub(&sphere->center, 1, &ray->origin);
     double a = vec3_dot(&ray->direction, &ray->direction);
     double b = -2 * vec3_dot(&ray->direction, &OC);
     double c = vec3_dot(&OC, &OC) - sphere->radius * sphere->radius;
     double discriminant = b * b - 4 * a * c;
-    return discriminant < 0 ? -1.0 : (-b - sqrt(discriminant)) / (2 * a); // get the first hit point and ignore sphere behind the camera right now
+    if (discriminant < 0) return false;
+    double t = (-b - sqrt(discriminant)) / (2 * a);
+    if (t <= t_min || t >= t_max) {
+        t = (-b + sqrt(discriminant)) / (2 * a);
+        if (t <= t_min || t >= t_max) return false;
+    }
+    Point3 hit_point = ray_at(ray, t);
+    Vec3 outward = vec3_sub(&hit_point, 1, &sphere->center);
+    Vec3 normal_outward = vec3_div_scalar(&outward, 1, sphere->radius);
+    record->ray_t = t;
+    record->hit_point = hit_point;
+    if (vec3_dot(&ray->direction, &normal_outward) > 0.0) {
+        record->normal = vec3_neg(&normal_outward);
+        record->is_ray_outside_shape = false;
+    } else {
+        record->normal = normal_outward;
+        record->is_ray_outside_shape = true;
+    }
+    return true;
+}
+
+Sphere sphere_init(Point3 center, double radius)
+{
+    assert(radius > 0.0 && "sphere_init radius is less than 0");
+    Shape super = shape_init(&sphere_hit);
+    return (Sphere){ .super = super, .center = center, .radius = radius };
 }

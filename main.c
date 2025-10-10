@@ -2,18 +2,16 @@
 #include "color.h"
 #include "ray.h"
 #include "sphere.h"
+#include "shape.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 Color get_ray_color(Ray *ray)
 {
-    Sphere front_sphere = { .center = { 0.0, 0.0, -1.0 }, .radius = 0.5 }; // in front of camera
-    double t = sphere_hit(&front_sphere, ray);
-    if (t > 0.0) {
-        Point3 hit_point = ray_at(ray, t);
-        Vec3 CP = vec3_sub(&hit_point, 1, &front_sphere.center);
-        Vec3 N = vec3_unit_vector(&CP);
-        return color_init((N.x + 1 ) * 0.5, (N.y + 1) * 0.5, (N.z + 1) * 0.5);
-    }
+    HitRecord record;
+    Sphere sphere = sphere_init((Point3){ 0.0, 0.0, -1.0 }, 0.5);
+    bool hit = shape_hit(&sphere, ray, 0.001, 10000.0, &record);
+    if (hit) return color_init((record.normal.x + 1 ) * 0.5, (record.normal.y + 1) * 0.5, (record.normal.z + 1) * 0.5);
     Vec3 unit_direction = vec3_unit_vector(&ray->direction); // [-1, 1]
     double a = 0.5 * (unit_direction.y + 1.0); // [0, 1]
     Color start_color = color_init(1.0, 1.0, 1.0);

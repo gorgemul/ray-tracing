@@ -15,8 +15,9 @@ Vec3 vec3_mul(Vec3 *vec, size_t n, ...);
 Vec3 vec3_div(Vec3 *vec, size_t n, ...);
 Vec3 vec3_mul_scalar(Vec3 *vec, size_t n, ...);
 Vec3 vec3_div_scalar(Vec3 *vec, size_t n, ...);
+Vec3 vec3_neg(Vec3 *vec);
 Vec3 vec3_unit_vector(Vec3 *vec);
-double vec3_len_squared(Vec3 *vec);
+double vec3_squared_len(Vec3 *vec);
 double vec3_len(Vec3 *vec);
 double vec3_dot(Vec3 *vec1, Vec3 *vec2);
 

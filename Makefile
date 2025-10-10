@@ -1,7 +1,7 @@
 build:
 	gcc -Wall -Wextra -pedantic -o ./ray-tracing *.c -lm
 
-test-build:
+debug:
 	gcc -Wall -Wextra -pedantic -g -o ./ray-tracing *.c -lm
 
 run: build
