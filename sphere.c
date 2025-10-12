@@ -1,8 +1,9 @@
 #include "sphere.h"
+#include "interval.h"
 #include <math.h>
 #include <assert.h>
 
-static bool sphere_hit(Shape *shape, Ray *ray, double t_min, double t_max, HitRecord *record)
+static bool sphere_hit(Shape *shape, Ray *ray, Interval *interval, HitRecord *record)
 {
     Sphere *sphere = (Sphere*)shape;
     Vec3 OC = vec3_sub(&sphere->center, 1, &ray->origin);
@@ -12,9 +13,9 @@ static bool sphere_hit(Shape *shape, Ray *ray, double t_min, double t_max, HitRe
     double discriminant = b * b - 4 * a * c;
     if (discriminant < 0) return false;
     double t = (-b - sqrt(discriminant)) / (2 * a);
-    if (t <= t_min || t >= t_max) {
+    if (!interval_surrounds(interval, t)) {
         t = (-b + sqrt(discriminant)) / (2 * a);
-        if (t <= t_min || t >= t_max) return false;
+        if (!interval_surrounds(interval, t)) return false;
     }
     Point3 hit_point = ray_at(ray, t);
     Vec3 outward = vec3_sub(&hit_point, 1, &sphere->center);
@@ -34,6 +35,7 @@ static bool sphere_hit(Shape *shape, Ray *ray, double t_min, double t_max, HitRe
 Sphere sphere_init(Point3 center, double radius)
 {
     assert(radius > 0.0 && "sphere_init radius is less than 0");
-    Shape super = shape_init(&sphere_hit);
+    static struct ShapeVTable vtbl = { .hit = &sphere_hit };
+    Shape super = shape_init(&vtbl);
     return (Sphere){ .super = super, .center = center, .radius = radius };
 }

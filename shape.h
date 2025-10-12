@@ -3,6 +3,7 @@
 
 #include "vec3.h"
 #include "ray.h"
+#include "interval.h"
 #include <stdbool.h>
 
 typedef struct {
@@ -19,10 +20,10 @@ typedef struct {
 } Shape;
 
 struct ShapeVTable {
-    bool (*hit)(Shape *shape, Ray *ray, double t_min, double t_max, HitRecord *record);
+    bool (*hit)(Shape *shape, Ray *ray, Interval *interval, HitRecord *record);
 };
 
-Shape shape_init(bool (*hit_func)(Shape *shape, Ray *ray, double t_min, double t_max, HitRecord *record));
-bool shape_hit(void *p, Ray *ray, double t_min, double t_max, HitRecord *record);
+Shape shape_init(struct ShapeVTable *init_vtbl);
+bool shape_hit(void *p, Ray *ray, Interval *interval, HitRecord *record);
 
 #endif // SHAPE_H_

@@ -2,8 +2,10 @@
 #define COMMON_H_
 
 #include <math.h> // for INFINITY
+#include <stdlib.h>
 
 #define PI  3.14159265358979323846
-#define INF INFINITY
+
+double rand_double(void);
 
 #endif // COMMON_H_
