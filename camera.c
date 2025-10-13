@@ -2,14 +2,20 @@
 #include "color.h"
 #include "interval.h"
 #include "common.h"
+#include <math.h>
 
-Color intersect(Ray *ray, Shape *world)
+Color intersect(Ray *ray, Shape *world, int remaining_reflection)
 {
+    if (remaining_reflection == 0) return color_init(0.0, 0.0, 0.0);
     HitRecord record;
-    if (shape_hit(world, ray, &(Interval){ 0, INFINITY }, &record))
-        return color_init((record.normal.x + 1 ) * 0.5, (record.normal.y + 1) * 0.5, (record.normal.z + 1) * 0.5);
+    if (shape_hit(world, ray, &(Interval){ 0.01, INFINITY }, &record)) {
+        Vec3 unit_vec3 = rand_unit_vec3();
+        Vec3 direction = vec3_add(&record.normal, 1, &unit_vec3);
+        Color scatterd_color = intersect(&(Ray){ .origin = record.hit_point, .direction = direction }, world, remaining_reflection - 1);
+        return vec3_mul_scalar(&scatterd_color, 1, 0.3);
+    }
     Vec3 unit_direction = vec3_unit_vector(&ray->direction);
-    double a = 0.5 * (unit_direction.x + 1.0);
+    double a = 0.5 * (unit_direction.y + 1.0);
     Color start_color = color_init(1.0, 1.0, 1.0);
     Color end_color = color_init(0.5, 0.5, 1.0);
     double r = (1.0 - a) * start_color.x + end_color.x * a;
@@ -18,7 +24,7 @@ Color intersect(Ray *ray, Shape *world)
     return color_init(r, g, b);
 }
 
-Camera camera_init(double image_ratio, int image_width, int samples_per_pixel)
+Camera camera_init(double image_ratio, int image_width, int samples_per_pixel, int max_reflection)
 {
     int image_height = (int)(image_width / image_ratio);
     if (image_height < 1) image_height = 1;
@@ -39,16 +45,19 @@ Camera camera_init(double image_ratio, int image_width, int samples_per_pixel)
     return (Camera){
         .image_width = image_width,
         .image_height = image_height,
+        .samples_per_pixel = samples_per_pixel,
+        .max_reflection = max_reflection,
         .center = camera_center,
         .pixel_00 = pixel_00,
         .pixel_delta_u = pixel_delta_u,
         .pixel_delta_v = pixel_delta_v,
-        .samples_per_pixel = samples_per_pixel,
     };
 }
 
 void camera_render(Camera *camera, Shape *world)
 {
+    size_t progress = 0;
+    fprintf(stderr, "start rendering...\n");
     printf("P3\n%d %d\n255\n", camera->image_width, camera->image_height);
     for (int h = 0; h < camera->image_height; ++h) {
         for (int w = 0; w < camera->image_width; ++w) {
@@ -58,14 +67,14 @@ void camera_render(Camera *camera, Shape *world)
             Vec3 delta_u = vec3_mul_scalar(&camera->pixel_delta_u, 1, (double)w);
             Vec3 delta_v = vec3_mul_scalar(&camera->pixel_delta_v, 1, (double)h);
             for (int i = 0; i < camera->samples_per_pixel; ++i) {
-                Vec3 offset_u = vec3_mul_scalar(&camera->pixel_delta_u, 1, rand_double() - 0.5);
-                Vec3 offset_v = vec3_mul_scalar(&camera->pixel_delta_v, 1, rand_double() - 0.5);
+                Vec3 offset_u = vec3_mul_scalar(&camera->pixel_delta_u, 1, rand_double(0, 1) - 0.5);
+                Vec3 offset_v = vec3_mul_scalar(&camera->pixel_delta_v, 1, rand_double(0, 1) - 0.5);
                 Vec3 u = vec3_add(&delta_u, 1, &offset_u);
                 Vec3 v = vec3_add(&delta_v, 1, &offset_v);
                 Point3 pixel = vec3_add(&camera->pixel_00, 2, &u, &v);
                 Vec3 direction = vec3_sub(&pixel, 1, &camera->center);
                 Ray ray = { .origin = camera->center, .direction = direction };
-                Color color = intersect(&ray, world);
+                Color color = intersect(&ray, world, camera->max_reflection);
                 r += color.x;
                 g += color.y;
                 b += color.z;
@@ -73,5 +82,14 @@ void camera_render(Camera *camera, Shape *world)
             Color blend_color = color_init(r / camera->samples_per_pixel, g / camera->samples_per_pixel, b / camera->samples_per_pixel);
             color_write(&blend_color, stdout);
         }
+        int interval = camera->image_height / 10;
+        int is_last_render = h == camera->image_height - 1;
+        if (h > 0 && (h % interval == 0 || is_last_render)) {
+            if (progress == 90 && !is_last_render) continue;
+            progress += 10;
+            fprintf(stderr, "progress %zu%%\n", progress);
+        }
     }
+    fprintf(stderr, "render success\n");
+    fprintf(stderr, "generating file: \"ray-tracing.ppm\"\n");
 }

@@ -1,5 +1,11 @@
 #include "color.h"
 #include <stdio.h>
+#include <math.h>
+
+double to_gamma_space(double linear)
+{
+    return linear <= 0 ? 0 : sqrt(linear);
+}
 
 Color color_init(double r, double g, double b)
 {
@@ -11,8 +17,8 @@ Color color_init(double r, double g, double b)
 
 void color_write(Color *color, FILE *stream)
 {
-    int r = (int)(255.999 * color->x);
-    int g = (int)(255.999 * color->y);
-    int b = (int)(255.999 * color->z);
+    int r = (int)(255.999 * to_gamma_space(color->x));
+    int g = (int)(255.999 * to_gamma_space(color->y));
+    int b = (int)(255.999 * to_gamma_space(color->z));
     fprintf(stream, "%d %d %d\n", r, g, b);
 }
