@@ -4,14 +4,16 @@
 #include "vec3.h"
 #include "ray.h"
 #include "interval.h"
+#include "material.h"
 #include <stdbool.h>
 
-typedef struct {
+struct HitRecord {
     Point3 hit_point;
     Vec3 normal;
+    Material *material;
     double ray_t;
     bool is_ray_outside_shape;
-} HitRecord;
+};
 
 struct ShapeVTable;
 
@@ -20,10 +22,10 @@ typedef struct {
 } Shape;
 
 struct ShapeVTable {
-    bool (*hit)(Shape *shape, Ray *ray, Interval *interval, HitRecord *record);
+    bool (*hit)(Shape *shape, Ray *ray, Interval *interval, struct HitRecord *record);
 };
 
 Shape shape_init(struct ShapeVTable *init_vtbl);
-bool shape_hit(void *p, Ray *ray, Interval *interval, HitRecord *record);
+bool shape_hit(void *p, Ray *ray, Interval *interval, struct HitRecord *record);
 
 #endif // SHAPE_H_

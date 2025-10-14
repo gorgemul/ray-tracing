@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-static bool shape_vector_hit(Shape *shape, Ray *ray, Interval *interval, HitRecord *record)
+static bool shape_vector_hit(Shape *shape, Ray *ray, Interval *interval, struct HitRecord *record)
 {
     ShapeVector *sv = (ShapeVector*)shape;
     double max = interval->max;
@@ -32,7 +32,7 @@ ShapeVector *shape_vector_init(size_t cap)
         exit(1);
     }
     static struct ShapeVTable vtbl = { .hit = &shape_vector_hit };
-    sv->super = shape_init(&vtbl);
+    sv->shape = shape_init(&vtbl);
     sv->list = list;
     sv->len = 0;
     sv->cap = cap;

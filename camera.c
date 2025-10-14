@@ -1,18 +1,21 @@
 #include "camera.h"
 #include "color.h"
 #include "interval.h"
+#include "material.h"
 #include "common.h"
 #include <math.h>
 
 Color intersect(Ray *ray, Shape *world, int remaining_reflection)
 {
     if (remaining_reflection == 0) return color_init(0.0, 0.0, 0.0);
-    HitRecord record;
+    struct HitRecord record;
     if (shape_hit(world, ray, &(Interval){ 0.01, INFINITY }, &record)) {
-        Vec3 unit_vec3 = rand_unit_vec3();
-        Vec3 direction = vec3_add(&record.normal, 1, &unit_vec3);
-        Color scatterd_color = intersect(&(Ray){ .origin = record.hit_point, .direction = direction }, world, remaining_reflection - 1);
-        return vec3_mul_scalar(&scatterd_color, 1, 0.3);
+        Ray scattered_ray;
+        Color attenuation;
+        if (!material_scatter(record.material, ray, &record, &attenuation, &scattered_ray))
+            return color_init(0.0, 0.0, 0.0);
+        Color scattered_color = intersect(&scattered_ray, world, remaining_reflection - 1);
+        return vec3_mul(&scattered_color, 1, &attenuation);
     }
     Vec3 unit_direction = vec3_unit_vector(&ray->direction);
     double a = 0.5 * (unit_direction.y + 1.0);

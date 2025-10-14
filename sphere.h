@@ -4,13 +4,15 @@
 #include "vec3.h"
 #include "ray.h"
 #include "shape.h"
+#include "material.h"
 
 typedef struct {
-    Shape  super;
+    Shape  shape;
+    Material *material;
     Point3 center;
     double radius;
 } Sphere;
 
-Sphere sphere_init(Point3 center, double radius);
+Sphere sphere_init(void *material, Point3 center, double radius);
 
 #endif // SPHERE_H_

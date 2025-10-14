@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 typedef struct {
-    Shape super;
+    Shape shape;
     Shape **list;
     size_t len;
     size_t cap;

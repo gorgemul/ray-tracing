@@ -3,7 +3,7 @@
 #include <math.h>
 #include <assert.h>
 
-static bool sphere_hit(Shape *shape, Ray *ray, Interval *interval, HitRecord *record)
+static bool sphere_hit(Shape *shape, Ray *ray, Interval *interval, struct HitRecord *record)
 {
     Sphere *sphere = (Sphere*)shape;
     Vec3 OC = vec3_sub(&sphere->center, 1, &ray->origin);
@@ -22,6 +22,7 @@ static bool sphere_hit(Shape *shape, Ray *ray, Interval *interval, HitRecord *re
     Vec3 normal_outward = vec3_div_scalar(&outward, 1, sphere->radius);
     record->ray_t = t;
     record->hit_point = hit_point;
+    record->material = sphere->material;
     if (vec3_dot(&ray->direction, &normal_outward) > 0.0) {
         record->normal = vec3_neg(&normal_outward);
         record->is_ray_outside_shape = false;
@@ -32,10 +33,10 @@ static bool sphere_hit(Shape *shape, Ray *ray, Interval *interval, HitRecord *re
     return true;
 }
 
-Sphere sphere_init(Point3 center, double radius)
+Sphere sphere_init(void *material, Point3 center, double radius)
 {
     assert(radius > 0.0 && "sphere_init radius is less than 0");
     static struct ShapeVTable vtbl = { .hit = &sphere_hit };
-    Shape super = shape_init(&vtbl);
-    return (Sphere){ .super = super, .center = center, .radius = radius };
+    Shape shape = shape_init(&vtbl);
+    return (Sphere){ .shape = shape, .material = (Material*)material, .center = center, .radius = radius };
 }

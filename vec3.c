@@ -123,3 +123,9 @@ double vec3_dot(Vec3 *vec1, Vec3 *vec2)
 {
     return vec1->x * vec2->x + vec1->y * vec2->y + vec1->z * vec2->z;
 }
+
+bool vec3_is_zero_vector(Vec3 *vec)
+{
+    double threadshold = 1e-7;
+    return vec->x <= threadshold && vec->y <= threadshold && vec->z <= threadshold;
+}

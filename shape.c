@@ -1,7 +1,7 @@
 #include "shape.h"
 #include <assert.h>
 
-bool hit(Shape *shape, Ray *ray, Interval *interval, HitRecord *record)
+bool hit(Shape *shape, Ray *ray, Interval *interval, struct HitRecord *record)
 {
     (void)shape;
     (void)ray;
@@ -18,7 +18,7 @@ Shape shape_init(struct ShapeVTable *init_vtbl)
     return (Shape){ vtbl };
 }
 
-bool shape_hit(void *p, Ray *ray, Interval *interval, HitRecord *record)
+bool shape_hit(void *p, Ray *ray, Interval *interval, struct HitRecord *record)
 {
     Shape *shape = (Shape*)p;
     return (*shape->vtbl->hit)(shape, ray, interval, record);
