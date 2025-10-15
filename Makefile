@@ -11,13 +11,13 @@ else
 endif
 
 build:
-	gcc -Wall -Wextra -pedantic -o ./ray-tracing *.c -lm
+	gcc -Wall -Wextra -pedantic -lm -Iinclude -o bin/ray-tracing src/*.c
 
 debug:
-	gcc -Wall -Wextra -pedantic -g -o ./ray-tracing *.c -lm
+	gcc -Wall -Wextra -pedantic -g -lm -Iinclude -o bin/ray-tracing src/*.c
 
 run: build
-	./ray-tracing > ray-tracing.ppm && $(OPEN) ray-tracing.ppm
+	bin/ray-tracing > assets/ray-tracing.ppm && $(OPEN) assets/ray-tracing.ppm
 
 clean:
-	rm -rf *.ppm ray-tracing*
+	rm -rf bin/* assets/ray-tracing.ppm
